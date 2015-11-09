@@ -1,20 +1,23 @@
 <?php require("header.php"); ?>
 
-<h3><?= $row['title']; ?></h3>
-<p><?= $row['text']; ?></p>
-<div class="comments"><a href="?act=view=entry&id=<?= $row['id'];?>">Comments</a></div>
+<h3><?= $ENTRY['title']; ?></h3>
+<p><?= $ENTRY['text']; ?></p>
 
-<?php if (IS_ADMIN): ?>
+<h3>Комментарии</h3>
 
-<h3>Добавить новую статью</h3>
+<?php foreach($comments as $row): ?>
 
-<form class="form-horizontal" action="?act=do-new-entry" method="POST">
-  <div class="control-group">
-    <label class="control-label" for="inputEmail">Title</label>
-    <div class="controls">
-      <input type="text" name="title" id="inputEmail" placeholder="Title">
-    </div>
-  </div>
+<p class="text"><?= $row['text']; ?></p>
+<div class="comments">
+	<span class="author"><?= $row['author'];?></span>
+	<span class="date"><?= $row['date'];?></span>
+</div>
+
+<?php endforeach; ?>
+
+<h3>Добавить новый комментарий</h3>
+
+<form class="form-horizontal" action="?act=do-new-comment" method="POST">
   <div class="control-group">
     <label class="control-label" for="inputPassword">Author</label>
     <div class="controls">
@@ -33,7 +36,5 @@
     </div>
   </div>
 </form>
-
-<?php endif; ?>
 
 <?php require("footer.php"); ?>

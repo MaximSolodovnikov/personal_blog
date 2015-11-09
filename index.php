@@ -12,7 +12,11 @@ $act = $_GET['act'] ? $_GET['act'] : 'list';
 switch($act) {
 	case "list":
 		$records = array();
-		$sql = $mysqli->query("SELECT * FROM articles");
+		$sql = $mysqli->query("SELECT articles.*, COUNT(comments.id) AS comments 
+							   FROM articles
+							   LEFT JOIN comments ON articles.id = comments.entry_id
+							   GROUP BY articles.id
+							   ORDER BY date DESC");
 		while($row = $sql->fetch_assoc()){
 			$row['date'] = date('Y-m-d / H:i:s');
 			if (mb_strlen($row['text']) > 100) {
@@ -28,11 +32,32 @@ switch($act) {
 	case 'view-entry':
 		if ( ! isset($_GET['id'])) die("Missing id parameter");
 		$id = intval($_GET['id']);
-		$row = $mysqli->query("SELECT * FROM articles WHERE id = $id")->fetch_assoc();
-		if ( ! $row) die("No such entry");
-		$row['text'] = nl2br($row['text']);
-		$row['text'] = htmlspecialchars($row['text']);
+		$ENTRY = $mysqli->query("SELECT * FROM articles WHERE id = $id")->fetch_assoc();
+		if ( ! $ENTRY) die("No such entry");
+		$ENTRY['text'] = nl2br($ENTRY['text']);
+		$ENTRY['text'] = htmlspecialchars($ENTRY['text']);
+		
+		$comments = array();
+		
+		$sql = $mysqli->query("SELECT * FROM comments WHERE entry_id = $id");
+		while($row = $sql->fetch_assoc()){
+			$row['date'] = date('Y-m-d / H:i:s');
+			$row['text'] = nl2br(htmlspecialchars($row['text']));
+			$row['author'] = htmlspecialchars($row['author']);
+			$comments[] = $row;
+		}
 		require('template/entry.php');
+	break;
+	
+	case "do-new-entry":
+		$sql = $mysqli->prepare("INSERT INTO articles(author, title, date, text) VALUES(?, ?, ?, ?)");
+		$date = date('Y-m-d');
+		$sql->bind_param('ssss', $_POST['author'], $_POST['title'], $date, $_POST['text']);
+		if($sql->execute()) {
+			header("Location: .");
+		} else {
+			die("Cannot insert entry");
+		}
 	break;
 	
 	case 'login':
