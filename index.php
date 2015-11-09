@@ -11,12 +11,18 @@ $act = $_GET['act'] ? $_GET['act'] : 'list';
 
 switch($act) {
 	case "list":
+		$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+		$limit = 1;
+		$offset = ($page - 1) * $limit;
 		$records = array();
+		$pages_result = $mysqli->query("SELECT COUNT(*) AS cnt FROM articles")->fetch_assoc();
+		$pages = $pages_result['cnt'];
 		$sql = $mysqli->query("SELECT articles.*, COUNT(comments.id) AS comments 
 							   FROM articles
 							   LEFT JOIN comments ON articles.id = comments.entry_id
 							   GROUP BY articles.id
-							   ORDER BY date DESC");
+							   ORDER BY date DESC
+							   LIMIT $offset, $limit");
 		while($row = $sql->fetch_assoc()){
 			$row['date'] = date('Y-m-d / H:i:s');
 			if (mb_strlen($row['text']) > 100) {

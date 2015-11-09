@@ -5,12 +5,22 @@
 <h3><a href="?act=view-entry&id=<?= $row['id'];?>"><?= $row['title']; ?></a></h3>
 <p class="text"><?= $row['text']; ?></p>
 <div class="comments">
-	<span class="author"><?= $row['author'];?></span>
-	<span class="date"><?= $row['date'];?></span>
-	<a href="?act=view-entry&id=<?= $row['id'];?>"><?= $row['comments'];?>Comments</a>
+	<span class="author"><?= $row['author']; ?></span>
+	<span class="date"><?= $row['date']; ?></span>
+	<a href="?act=view-entry&id=<?= $row['id']; ?>"><?= $row['comments']; ?>Comments</a>
 </div>
 
 <?php endforeach; ?>	
+
+<!-- -------------Output of pagination---------------------- -->
+<div class="pages">
+Pages:
+<?php for ($i = 1; $i < $pages; $i++): ?>
+	<?php if ($i == $page): ?> <b><?= $i; ?></b>
+	<?php else : ?> <a href="?page=<?= $i; ?>"><?= $i; ?></a>
+	<?php endif; ?>
+<?php endfor; ?>
+</div>
 
 <?php if (IS_ADMIN): ?>
 
